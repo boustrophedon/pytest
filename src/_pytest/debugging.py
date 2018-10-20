@@ -99,6 +99,11 @@ class pytestPDB(object):
         if set_break:
             cls._pdb_cls().set_trace(frame)
 
+    @classmethod
+    def runcall(cls, func, *args, **kwargs):
+        """ Pass through runcall method to underlying debugger class """
+        cls._pdb_cls().runcall(func, *args, **kwargs)
+
 
 class PdbInvoke(object):
     def pytest_exception_interact(self, node, call, report):
@@ -125,7 +130,7 @@ class PdbTrace(object):
 def _test_pytest_function(pyfuncitem):
     pytestPDB.set_trace(set_break=False)
     testfunction = pyfuncitem.obj
-    pyfuncitem.obj = pdb.runcall
+    pyfuncitem.obj = pytestPDB.runcall
     if pyfuncitem._isyieldedfunction():
         arg_list = list(pyfuncitem._args)
         arg_list.insert(0, testfunction)
